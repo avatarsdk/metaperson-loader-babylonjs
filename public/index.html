@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+
+    <title>Avatar SDK MetaPerson Babylon.js loader</title>
+
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #header {
+        text-align: center;
+      }
+    </style>
+
+    <script src="../libs/babylon/babylon.js"></script>
+    <script src="../libs/babylon/babylonjs.loaders.js"></script>
+  </head>
+
+  <body id="body">
+    <div id="header">
+      <h1>Avatar SDK MetaPerson Babylon.js loader</h1>
+      <label for="loadFile">Load avatar (.glb only):</label>
+      <input type="file" id="loadFile" accept=".glb" title="Choose .glb file"/>
+      <br/><br/>
+    </div>
+
+    <canvas id="avatarViewer"></canvas>
+
+    <script type="module">
+      import { createScene } from "../src/createScene.js"
+      import { AvatarController }   from "../src/AvatarController.js"
+
+      const body = document.getElementById("body");
+      const header = document.getElementById("header");
+      const canvas = document.getElementById("avatarViewer");
+
+      canvas.height = body.offsetHeight - header.offsetHeight;
+      canvas.width = window.innerWidth;
+
+      window.addEventListener("resize", function () {
+        canvas.height = window.innerHeight - header.offsetHeight;
+        canvas.width = window.innerWidth;
+
+      });
+
+      const config = {
+        camera: {
+          pos: { x: 0, y: 1.8, z: 2.7},
+          lookAt: { x: 0, y: 1.0, z: 0}
+        }
+      };
+
+      const scene = createScene(canvas, config);
+
+      const avatar = new AvatarController();
+      avatar.loadModel("../public/models/sample_avatar.glb", scene, (avatar) => {
+        avatar.addToScene(scene);
+      });
+
+      document.getElementById('loadFile').addEventListener("change", () => {
+        if (event.target.files.length > 0) {
+          var reader = new FileReader();
+          reader.addEventListener('load', (event) => {
+            avatar.loadModel(event.target.result, scene, (avatar) => {
+              avatar.addToScene(scene);
+            });
+          });
+          reader.readAsDataURL(event.target.files[0]);
+        }
+      });
+    </script>
+  </body>
+</html>
